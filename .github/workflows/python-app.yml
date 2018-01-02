@@ -1,4 +1,4 @@
-name: Update Quotes and Uptime
+name: Update Quotes
 
 on:
   schedule:
@@ -27,7 +27,7 @@ jobs:
     - name: Install dependencies
       run: pip install lxml
         
-    - name: Run quote rotation and uptime update
+    - name: Run quote rotation
       run: python today.py --auto
 
     - name: Commit and push changes
@@ -35,5 +35,5 @@ jobs:
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
         git add .
-        git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update: Rotate quotes and uptime"
+        git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update: Rotate quotes"
         git push origin HEAD:${{ github.ref }}

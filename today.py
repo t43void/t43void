@@ -30,40 +30,7 @@ QUOTES = {
     ]
 }
 
-def calculate_uptime():
-    """
-    Calculate uptime from a start date (10 years and 21 hours ago from now)
-    Returns formatted uptime string
-    """
-    now = datetime.datetime.now()
-    
-    # Calculate start date: 10 years and 21 hours ago from now
-    start_date = now - datetime.timedelta(days=365*10, hours=21)
-    
-    # Calculate difference
-    delta = now - start_date
-    
-    years = delta.days // 365
-    remaining_days = delta.days % 365
-    months = remaining_days // 30
-    days = remaining_days % 30
-    hours = delta.seconds // 3600
-    minutes = (delta.seconds % 3600) // 60
-    
-    # Format uptime string
-    uptime_parts = []
-    if years > 0:
-        uptime_parts.append(f"{years} year{'s' if years != 1 else ''}")
-    if months > 0:
-        uptime_parts.append(f"{months} month{'s' if months != 1 else ''}")
-    if days > 0:
-        uptime_parts.append(f"{days} day{'s' if days != 1 else ''}")
-    if hours > 0:
-        uptime_parts.append(f"{hours} hour{'s' if hours != 1 else ''}")
-    if minutes > 0:
-        uptime_parts.append(f"{minutes} minute{'s' if minutes != 1 else ''}")
-    
-    return " ".join(uptime_parts)
+
 
 def get_rotating_quote(test_mode=False):
     """
@@ -130,35 +97,7 @@ def update_svg_quote(filename, quote_data):
     except Exception as e:
         print(f"✗ Error updating {filename}: {e}")
 
-def update_svg_uptime(filename, uptime_data):
-    """
-    Updates the uptime in the specified SVG file
-    """
-    try:
-        # Read the file content
-        with open(filename, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        # Find and replace uptime pattern
-        import re
-        
-        # Pattern to match uptime (look for text that contains "years")
-        pattern = r'(\d+ years?)'
-        
-        if re.search(pattern, content):
-            # Replace the uptime
-            new_content = re.sub(pattern, uptime_data, content)
-            
-            # Write back to file
-            with open(filename, 'w', encoding='utf-8') as f:
-                f.write(new_content)
-            
-            print(f"✓ Updated uptime in {filename}")
-        else:
-            print(f"✗ Could not find uptime pattern in {filename}")
-            
-    except Exception as e:
-        print(f"✗ Error updating uptime in {filename}: {e}")
+
 
 def show_all_quotes():
     """
@@ -207,19 +146,13 @@ def run_auto_update():
     """
     print("🤖 Running automatic update for GitHub Actions...")
     
-    # Calculate current uptime
-    current_uptime = calculate_uptime()
-    print(f"⏰ Current uptime: {current_uptime}")
-    
     # Get current quote based on time
     current_quote = get_rotating_quote()
     print(f"📝 Current quote: {current_quote}")
     
-    # Update both SVG files with quote and uptime
+    # Update both SVG files with quote only
     update_svg_quote('dark_mode.svg', current_quote)
     update_svg_quote('light_mode.svg', current_quote)
-    update_svg_uptime('dark_mode.svg', current_uptime)
-    update_svg_uptime('light_mode.svg', current_uptime)
     
     print("✅ Automatic update complete!")
 
@@ -233,10 +166,6 @@ def main():
         return
     
     print("🔄 Rotating quotes from Musashi and Sun Tzu...")
-    
-    # Calculate current uptime
-    current_uptime = calculate_uptime()
-    print(f"⏰ Current uptime: {current_uptime}")
     
     # Show all available quotes first
     show_all_quotes()
@@ -263,13 +192,11 @@ def main():
             current_quote = get_rotating_quote()
             print(f"\n📝 Current quote: {current_quote}")
         
-        # Update both SVG files with quote and uptime
+        # Update both SVG files with quote only
         update_svg_quote('dark_mode.svg', current_quote)
         update_svg_quote('light_mode.svg', current_quote)
-        update_svg_uptime('dark_mode.svg', current_uptime)
-        update_svg_uptime('light_mode.svg', current_uptime)
         
-        print("✅ Quote rotation and uptime update complete!")
+        print("✅ Quote rotation complete!")
         
         # Show when the next quote change will occur
         current_hour = datetime.datetime.now().hour
