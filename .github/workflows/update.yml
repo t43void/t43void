@@ -7,7 +7,7 @@ on:
   workflow_dispatch: # Allow manual runs
 
 permissions:
-  contents: write   #  allow pushing back to the repo
+  contents: write   # allow workflow to push to repo
 
 jobs:
   update:
@@ -17,8 +17,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}   #  ensures push works
-        
+        token: ${{ secrets.GITHUB_TOKEN }}   # ensures checkout uses auth
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
