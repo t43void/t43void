@@ -6,6 +6,9 @@ on:
     - cron: '0 */3 * * *'
   workflow_dispatch: # Allow manual runs
 
+permissions:
+  contents: write   #  allow pushing back to the repo
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -13,26 +16,24 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}   #  ensures push works
+        
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
         
     - name: Install dependencies
-      run: |
-        pip install lxml
+      run: pip install lxml
         
     - name: Run quote rotation and uptime update
-      run: |
-        python today.py --auto
-      env:
-        # Add any environment variables if needed
-        
+      run: python today.py --auto
+
     - name: Commit and push changes
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
         git add .
         git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update: Rotate quotes and uptime"
-        git push
+        git push origin HEAD:${{ github.ref }}
