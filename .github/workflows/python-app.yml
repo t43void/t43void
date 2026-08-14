@@ -6,34 +6,46 @@ on:
     - cron: '0 */3 * * *'
   workflow_dispatch: # Allow manual runs
 
+concurrency:
+  group: update-quotes
+  cancel-in-progress: false
+
 permissions:
   contents: write   # allow workflow to push to repo
 
 jobs:
   update:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}   # ensures checkout uses auth
+        # Always start from latest main so re-runs can fast-forward
+        ref: main
+        fetch-depth: 0
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v6
       with:
-        python-version: '3.9'
-        
+        python-version: '3.12'
+
     - name: Install dependencies
-      run: pip install lxml
-        
+      run: pip install -r requirements.txt
+
     - name: Run quote rotation
       run: python today.py --auto
 
     - name: Commit and push changes
       run: |
-        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
-        git add .
-        git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update: Rotate quotes"
-        git push origin HEAD:${{ github.ref }}
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config user.name "github-actions[bot]"
+        git add dark_mode.svg light_mode.svg
+        if git diff --staged --quiet; then
+          echo "No quote changes to commit"
+          exit 0
+        fi
+        git commit -m "Auto-update: Rotate quotes"
+        # Rebase onto latest main to avoid non-fast-forward failures on re-runs
+        git pull --rebase origin main
+        git push origin HEAD:main
