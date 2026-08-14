@@ -49,3 +49,9 @@ jobs:
         # Rebase onto latest main to avoid non-fast-forward failures on re-runs
         git pull --rebase origin main
         git push origin HEAD:main
+
+    - name: Purge jsDelivr cache
+      if: success()
+      run: |
+        curl -fsS "https://purge.jsdelivr.net/gh/t43void/t43void@main/dark_mode.svg" || true
+        curl -fsS "https://purge.jsdelivr.net/gh/t43void/t43void@main/light_mode.svg" || true
